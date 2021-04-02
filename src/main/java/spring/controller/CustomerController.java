@@ -1,6 +1,5 @@
 package spring.controller;
 
-import org.aspectj.apache.bcel.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,20 +9,18 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import spring.model.Customer;
-import spring.model.Person;
 import spring.service.customer.CustomerService;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/customer")
+@RequestMapping("/customers")
 public class CustomerController {
 
     private static final Logger logger = LoggerFactory.getLogger(CustomerController.class);
@@ -31,71 +28,50 @@ public class CustomerController {
     @Autowired
     private CustomerService customerService ;
 
-    @PostMapping(produces = "application/json")
-    public ResponseEntity<?> addCustomer(@Valid @RequestBody Person person){
-        Customer customerAdded = this.customerService.addCustomer(person);
-        if (customerAdded != null){
+    @PostMapping(produces = "application/json", value = "/signup")
+    public ResponseEntity<?> regisCustomer(@Valid @RequestBody Customer customer){
+        Customer customerAdded = this.customerService.regisCustomer(customer);
+//        if (customerAdded != null){
             return new ResponseEntity<>(customerAdded, HttpStatus.CREATED);
-        }
-        else {
-            return new ResponseEntity<>("fail", HttpStatus.SEE_OTHER);
-        }
+//        }
+//        else {
+//            return new ResponseEntity<>("fail", HttpStatus.BAD_REQUEST);
+//        }
     }
 
-    @GetMapping(value = "/{id}",produces = "application/json")
-    public ResponseEntity<?> getCustomerById(@PathVariable int id){
-        Customer customer =this.customerService.findCustomerById(id) ;
-        if(customer != null){
-            return new ResponseEntity<>(customer,HttpStatus.OK);
+    @PostMapping(produces = "application/json", value = "/signin")
+    public ResponseEntity<?> signIn(@Valid @RequestBody String email, @Valid @RequestBody String password ){
+        System.out.println(email + password);
+        Customer customerAdded = this.customerService.findCustomerByEmailAndPassword(email, password);
+        if (customerAdded != null){
+        return new ResponseEntity<>(customerAdded, HttpStatus.OK);
         }
         else {
-            return new ResponseEntity<>("fall",HttpStatus.SEE_OTHER) ;
-        }
-    }
-
-    @GetMapping (value = "/get_all", produces = "application/json")
-    public ResponseEntity<?> getAllCustomer(@RequestParam(name = "page") int page) {
-        List <Customer > customers = this.customerService.getAllCustomer(page) ;
-        logger.info("Customer: {}", customers);
-        if(customers != null){
-            return new ResponseEntity<>(customers,HttpStatus.OK) ;
-        }
-        else {
-            return  new ResponseEntity<>("fail",HttpStatus.SEE_OTHER) ;
-        }
-    }
-    @GetMapping(value = "/idCustomer/{idCustomer}",produces = "application/json")
-    public ResponseEntity<?> findByIdCustomer(@PathVariable String idCustomer){
-        Customer customer = this.customerService.findByIdCustomer(idCustomer);
-        if(customer != null){
-            return  new ResponseEntity<>(customer ,HttpStatus.OK) ;
-        }
-        else {
-            return new ResponseEntity<>("fail",HttpStatus.SEE_OTHER);
+            return new ResponseEntity<>("Invald account", HttpStatus.SEE_OTHER);
         }
     }
 
     @PutMapping(produces = "application/json")
-    public ResponseEntity<?> updateCustomer(@RequestBody Customer customer){
-        Customer customerUpdate =this.customerService.updateCustomer(customer) ;
+    public ResponseEntity<?> declareInformation(@RequestBody Customer customer){
+        Customer customerUpdate = this.customerService.declareInformation(customer) ;
         if(customerUpdate != null){
-            return new ResponseEntity<>("fail",HttpStatus.OK) ;
+            return new ResponseEntity<>(customerUpdate,HttpStatus.OK) ;
         }
         else {
-            return new ResponseEntity<>("fail",HttpStatus.SEE_OTHER) ;
+            return new ResponseEntity<>("fail",HttpStatus.BAD_REQUEST) ;
         }
     }
 
-    @DeleteMapping(value = "/{id}")
-    public ResponseEntity<?> deleteCustomer(@PathVariable int id){
-        boolean doSucces = this.customerService.deleteCustomer(id) ;
-        if(doSucces == true){
-            return new ResponseEntity<>("delete successfull",HttpStatus.OK);
-        }
-        else {
-            return new ResponseEntity<>("fail",HttpStatus.SEE_OTHER);
-        }
-    }
+//    @DeleteMapping(value = "/{id}")
+//    public ResponseEntity<?> deleteCustomer(@PathVariable int id){
+//        boolean doSucces = this.customerService.deleteCustomer(id) ;
+//        if(doSucces == true){
+//            return new ResponseEntity<>("delete successfull",HttpStatus.OK);
+//        }
+//        else {
+//            return new ResponseEntity<>("fail",HttpStatus.SEE_OTHER);
+//        }
+//    }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)

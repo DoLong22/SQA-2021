@@ -1,27 +1,19 @@
 package spring.service.customer;
 
 import spring.model.Customer;
-import spring.model.Person;
+import spring.model.DeclareInformation;
+import spring.model.Register;
 
 import java.util.List;
 
 public interface CustomerService {
 
-    Customer addCustomer(Customer customer) ;
+    Customer regisCustomer(Customer customer) ;
 
-    Customer addCustomer(Person person) ;
+    Customer declareInformation(Customer customer) ;
 
-    Customer updateCustomer(Customer customer);
+    Customer findCustomerByEmailAndPassword(String email, String password);
 
-    boolean deleteCustomer(int id);
+    Customer findCustomerByIdCustomer(int id);
 
-    List<Customer> getAllCustomer(int page);
-
-    Customer findCustomerById(int id);
-
-    Customer findByIdCustomer(String idCustomer) ;
-
-    Customer findByPerson(Person person) ;
-
-    Customer findByPersonId(int id);
 }
